@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "webvlnuper"
+version = "0.1.0"
+description = "基于视觉感知的网页自动导航模型优化：WebVLN 复现与 LLM 两阶段候选筛选"
+requires-python = ">=3.8"
+
+[tool.setuptools.packages.find]
+include = ["webvln*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# 让测试直接从仓库根目录导入 webvln，无需先安装为包。
+pythonpath = ["."]
+addopts = "-q"

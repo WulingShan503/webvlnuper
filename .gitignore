@@ -1,0 +1,24 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.extract/
+.tools/
+
+# 数据与权重
+data/webvln-v1/
+data/features/
+checkpoints/
+*.pt
+*.pth
+
+# 日志与缓存
+logs/
+runs/
+.cache/
+llm_cache.jsonl
+
+# 密钥
+.env

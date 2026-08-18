@@ -1,0 +1,37 @@
+# 第四章：两阶段候选动作筛选配置
+# 默认值对应论文 5.3 节的最优设置（LLM-top5）。
+
+screening:
+  enabled: true
+
+  # 阶段一：规则过滤（4.4 节）
+  rule_filter:
+    enabled: true
+    drop_duplicates: true
+    drop_empty: true
+    # 论文剪枝页脚与侧边栏；导航栏含品类入口，保留。
+    pruned_areas: [FOOTER, SIDEBAR]
+    blocked_keywords:
+      - advertisement
+      - popup
+      - tracking
+      - doubleclick
+      - utm_
+      - /ads/
+      - "javascript:void"
+    min_keep: 1
+
+  # 阶段二：LLM 语义排序（4.3 节）
+  llm_ranker:
+    enabled: true
+    model: gpt-3.5-turbo
+    # k=5 为 5.3 节消融最优；k=3 压缩过度，k=8 残留噪声。
+    k: 5
+    temperature: 0.0
+    max_retries: 3
+    timeout: 30.0
+
+  # 响应缓存：论文报告降低 API 调用 52%
+  cache:
+    enabled: true
+    path: .cache/llm_cache.jsonl

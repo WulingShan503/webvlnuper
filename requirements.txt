@@ -1,0 +1,17 @@
+# 论文实验环境：Python 3.8 / PyTorch 1.13 / CUDA 11.7
+torch==1.13.1
+torchvision==0.14.1
+transformers==4.26.1
+numpy==1.23.5
+Pillow==9.4.0
+PyYAML==6.0
+tqdm==4.64.1
+
+# 第四章：LLM 语义排序
+openai==0.27.8
+
+# 评测指标（WUPS 依赖 WordNet）
+nltk==3.8.1
+
+# 测试
+pytest==7.2.2
