@@ -22,3 +22,6 @@ llm_cache.jsonl
 
 # 密钥
 .env
+
+# 基线论文原文（可从 AAAI 官网获取，不纳入版本控制）
+00105-AAAI24.ChenQ.pdf
