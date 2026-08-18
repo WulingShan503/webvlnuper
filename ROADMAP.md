@@ -20,8 +20,14 @@
 - [x] YAML 配置装配（`config.py`）
 
 ## 阶段 2：第三章 —— WebVLN-Net 基线复现
-- [ ] 3.2 语言编码器（BERT-base，[CLS] Q [SEP] D [SEP]）
-- [ ] 3.3 候选特征编码（768 文本 + 2048 截图 + 2048 按钮图 = 4864）
+
+> 已核对官方 `r2r_src/` 实现，四处与论文描述不一致（候选特征组织方式、
+> 动作 logits 来源、层数、学习率），实现以官方为准并在注释中标注论文写法。
+> 详见 `webvln/models/config.py` 与各模块 docstring。
+
+- [x] 结构与训练超参集中定义（`config.py`，含 `PAPER_CONFIG` 对照）
+- [x] 3.2 语言编码器（BERT-base，[CLS] Q [SEP] D [SEP]）
+- [x] 3.3 候选特征编码（官方三 token 形式 + 论文 4864 拼接形式）
 - [ ] 3.4 状态 token 与递归更新
 - [ ] 3.5 跨模态 Transformer（4 层，8 头）
 - [ ] 3.6 动作预测（softmax over M 候选 + [EOA]）
