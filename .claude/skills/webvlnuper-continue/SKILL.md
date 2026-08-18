@@ -68,20 +68,58 @@ cd "D:/WebvlnUper" && .tools/py/python.exe -m pytest tests
 | `integration.py` | — | `screen_state`，插在 `make_candidate` 之前 |
 | `config.py` | — | YAML 装配，支持单阶段对照与 Top-k 消融 |
 
-## 下一步：第三章 WebVLN-Net 基线复现
+## 已完成（第三章，基线复现）
 
-按 `ROADMAP.md` 阶段 2，建议顺序：语言编码器 → 候选特征编码（4864 维）
-→ 状态 token 递归 → 跨模态 Transformer（4 层 8 头）→ 动作预测 → 回答头 → 损失。
+`webvln/models/` 共 10 个模块。**本机无 torch，这些模块只做了静态校验**
+（语法 + 内部导入可解析），没有运行时验证——用户已同意"只写代码不跑验证"。
 
-关键数字：BERT-base 12 层 768 维；候选特征 768+2048+2048=4864；
-跨模态 Transformer 4 层 8 头，FFN 3072；AdamW lr 1e-4，weight decay 1e-2，
-梯度裁剪 1.0，batch 8，200,000 迭代，140,000 后每 1,000 步验证；
-Best Score = SR + WUPS0.9。数据集 8,960 / 1,262 / 4,603。
+| 模块 | 论文 | 要点 |
+|---|---|---|
+| `config.py` | — | 超参集中定义，附 `PAPER_CONFIG` 记录论文写法 |
+| `language.py` | 3.2 | `[CLS] Q [SEP] D [SEP]`，语言只在初始化时编码一次 |
+| `candidate_encoder.py` | 3.3 | 官方三 token 形式 + 论文 4864 拼接形式 |
+| `attention.py` | 3.5 | forward 一律返回注意力分数（动作 logits 要用） |
+| `cross_modal.py` | 3.4/3.5 | 状态递归；语言侧交叉注意力跳过第 0 位 |
+| `action.py` | 3.6 | token(3n+1) → 动作(n+1) 归约、掩码、教师动作 |
+| `answering.py` | 3.7 | 自回归解码，因果掩码注册为 buffer |
+| `losses.py` | 3.8 | 式 (3.8.1)/(3.8.2)，导航损失按和累计再除 batch |
+| `webvln_net.py` | 3.1 | 主模型串联，**不含 rollout 循环**（属训练逻辑） |
+
+**与论文的四处差异**已记在 `[[webvln-official-model-vs-thesis]]` 与 README 的
+"与官方实现的差异"表格里，实现以官方为准。
+
+## 下一步：阶段 3 数据与训练
+
+按 `ROADMAP.md`：数据集加载（8,960 / 1,262 / 4,603）→ ResNet152 特征提取
+→ rollout 与训练循环 → 评测指标（SR / OSR / SPL / TL / WUPS）。
+
+关键数字：AdamW lr 1e-5（官方）/ 1e-4（论文），weight decay 1e-2，
+梯度裁剪 1.0，batch 4（官方）/ 8（论文），200,000 迭代，
+140,000 后每 1,000 步验证；Best Score = SR + WUPS0.9；maxAction 10；
+featdropout / dropout 均 0.4；feedback 用 `mix`（teacher 与 argmax 混合）。
+
+数据路径：`shortest_paths.json`、`map.json`、`text_feats.pkl`、
+`img_feats.pkl`、`screenshot_crop_feats.pkl`（官方 Google Drive 下载）。
+
+rollout 关键逻辑在官方 `agent.py:253` 起，教师动作在 `_teacher_action`，
+候选特征铺排在 `_candidate_variable`。
 
 ## 易错点
 
+第四章（筛选）：
 - `[EOA]` 停止动作与可点击候选并列，**不能**被筛掉。
 - 官方 `text` 字段是**列表**不是字符串。
 - 跳过 `[EOA]` 时不能让后续候选下标前移，否则与 `make_candidate` 行号错位。
 - 解析失败的 LLM 结果**不入缓存**，否则该页面永久退化为不筛选。
 - 不要就地修改模拟器的 `state['candidate']`，模拟器内部持有同一对象。
+
+第三章（模型）：
+- 注意力分数长度是 `3n+1`（每候选 3 个 token），动作空间是 `n+1`，
+  必须按步长 3 归约，否则 argmax 落在错误候选上。
+- 跨模态层的交叉注意力要传 `lang_feats[:, 1:, :]`（跳过第 0 位），
+  第 0 位已被状态 token 占据，不跳过会让状态对自己做注意力。
+- 导航损失用 `reduction="sum"` 跨步累计再除 batch；逐步取均值会摊薄
+  长轨迹样本的权重。
+- `length2mask` 返回 **True 表示 PAD**（与官方一致），语义反了会屏蔽掉
+  所有真实候选。
+- [EOA] 的特征是**全零**，其 logit 完全由注意力从状态 token 学得。
