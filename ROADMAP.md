@@ -28,11 +28,13 @@
 - [x] 结构与训练超参集中定义（`config.py`，含 `PAPER_CONFIG` 对照）
 - [x] 3.2 语言编码器（BERT-base，[CLS] Q [SEP] D [SEP]）
 - [x] 3.3 候选特征编码（官方三 token 形式 + 论文 4864 拼接形式）
-- [ ] 3.4 状态 token 与递归更新
-- [ ] 3.5 跨模态 Transformer（4 层，8 头）
-- [ ] 3.6 动作预测（softmax over M 候选 + [EOA]）
-- [ ] 3.7 回答头（自回归解码）
-- [ ] 3.8 损失函数（L_nav + λ·L_ans）
+- [x] 3.4 状态 token 与递归更新（`cross_modal.py`）
+- [x] 3.5 跨模态 Transformer（`attention.py` / `cross_modal.py`）
+- [x] 3.6 动作预测（`action.py`，含 token→候选归约与教师动作）
+- [x] 3.7 回答头（`answering.py`，自回归解码 + 贪心生成）
+- [x] 3.8 损失函数（`losses.py`，式 3.8.1 / 3.8.2）
+- [x] 主模型串联（`webvln_net.py`）
+- [ ] 补齐依赖 torch 的单元测试（本机无 torch，待环境具备）
 
 ## 阶段 3：数据与训练
 - [ ] WebVLN-v1 数据集加载（8,960 / 1,262 / 4,603）

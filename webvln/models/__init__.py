@@ -11,6 +11,8 @@
 注意力分数而非独立线性头。实现以官方为准，论文写法在注释中标注。
 """
 
-from webvln.models.config import WebVLNConfig
+from webvln.models.config import PAPER_CONFIG, WebVLNConfig
 
-__all__ = ["WebVLNConfig"]
+#: 需要 torch 的组件按需导入，避免仅读取配置时就拉起 torch。
+#: 用法：``from webvln.models.webvln_net import WebVLNNet``
+__all__ = ["WebVLNConfig", "PAPER_CONFIG"]
