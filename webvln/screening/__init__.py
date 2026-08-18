@@ -7,8 +7,17 @@ WebVLN 基线在每步决策时面对页面上全部可点击元素（平均约 
     阶段二 (llm_ranker)   LLM 语义排序：候选文本化后按与指令的相关性排序，取 Top-k
 """
 
+from webvln.screening.adapter import (
+    apply_screening_to_state,
+    build_instruction,
+    candidate_from_record,
+    candidates_from_state,
+)
+from webvln.screening.area import infer_area
 from webvln.screening.cache import RankCache
 from webvln.screening.candidate import Candidate, ElementType, PageArea
+from webvln.screening.config import build_screener
+from webvln.screening.integration import screen_candidates, screen_state
 from webvln.screening.llm_backend import OpenAIBackend, ScriptedBackend
 from webvln.screening.llm_ranker import LLMRanker, RankResult
 from webvln.screening.metrics import ScreeningMetrics, compression_ratio
@@ -20,6 +29,14 @@ __all__ = [
     "Candidate",
     "ElementType",
     "PageArea",
+    "infer_area",
+    "candidate_from_record",
+    "candidates_from_state",
+    "apply_screening_to_state",
+    "build_instruction",
+    "screen_state",
+    "screen_candidates",
+    "build_screener",
     "serialize",
     "serialize_all",
     "RuleFilter",

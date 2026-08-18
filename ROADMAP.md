@@ -14,7 +14,10 @@
 - [x] 响应缓存
 - [x] 4.5 CR / RR 指标
 - [x] 4.6 两阶段流水线编排
-- [ ] 与模拟器候选格式对接（`Candidate.from_simulator`）
+- [x] 与模拟器候选格式对接（`adapter.py`，对齐官方 `map.json` 字段）
+- [x] 页面区域推断（`area.py`，官方数据无区域标注）
+- [x] 接入官方 `env.py` 的入口（`integration.py`）
+- [x] YAML 配置装配（`config.py`）
 
 ## 阶段 2：第三章 —— WebVLN-Net 基线复现
 - [ ] 3.2 语言编码器（BERT-base，[CLS] Q [SEP] D [SEP]）
