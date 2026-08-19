@@ -77,7 +77,9 @@ webvln/
   train/                 训练 / 评测循环
     env.py                 导航环境与观测（筛选插在特征查表之前）
     rollout.py             动作解析、停止判定与轨迹记录
-tests/                   单元测试（215 个）
+    batching.py            观测 → 张量（3n+1 与 n+1 两套长度）
+    trainer.py             3.9  优化循环、验证调度与模型选择
+tests/                   单元测试（226 个）
 ```
 
 ## 接入基线模型
@@ -138,6 +140,41 @@ batch = ds.next_minibatch()   # 末尾不足时回绕补满，训练按迭代数
 首次加载会现场做 WordPiece 编码；用 `save_encoded` 写出 `{split}_enc.json`
 后，后续运行直接复用缓存（与官方 `prepare_dataset` 的行为一致）。
 
+## 训练与评测
+
+```python
+from webvln.data import FeatureStore, NavigationGraph, WebVLNDataset, load_bert_tokenizer
+from webvln.models.config import WebVLNConfig
+from webvln.models.webvln_net import WebVLNNet
+from webvln.screening import build_screener
+from webvln.train.env import WebVLNEnv
+from webvln.train.trainer import Trainer
+
+cfg = WebVLNConfig()
+tok = load_bert_tokenizer(cfg.bert_model_name)
+
+graph = NavigationGraph.from_dir("Data")
+feats = FeatureStore.from_dir("Data", feature_size=cfg.feature_size)
+screener = build_screener(path="configs/screening.yaml")   # None 即基线
+
+splits = {
+    s: WebVLNDataset.from_dir("Data", "seen", s, tokenizer=tok, batch_size=cfg.batch_size)
+    for s in ("train", "val", "test")
+}
+
+trainer = Trainer(WebVLNNet(cfg), WebVLNEnv(graph, feats, screener), cfg)
+trainer.tokenizer = tok        # 供 WUPS 解码生成的答案
+trainer.fit(splits["train"], {"val": splits["val"], "test": splits["test"]},
+            save_path="checkpoints/best_val.pt")
+```
+
+`fit` 按迭代数计数（默认 200,000），140,000 之后每 1,000 步验证，
+按 Best Score = SR + WUPS0.9 保存最优权重。模型选择只看验证集——
+用测试集选模型会让报告的 Test SR 不再是对未见数据的估计。
+
+复现基线（5.2 节）把 `screener` 设为 `None`，或在 YAML 中
+`screening.enabled: false`；Top-k 消融（5.3 节）只改 `llm_ranker.k`。
+
 ## 测试
 
 ```bash
@@ -145,9 +182,11 @@ pip install pytest pyyaml
 python -m pytest tests
 ```
 
-第四章筛选模块、第三章配置与数据加载、第五章评测指标、导航环境与 rollout
-共 215 个测试，不依赖 torch、nltk 与 API key 即可运行。
-第三章其余模块（跨模态层、回答头、损失）需 torch，相应测试待补。
+共 226 个测试，不依赖 torch、nltk 与 API key 即可运行：第四章筛选模块、
+第三章配置与数据加载、第五章评测指标、导航环境与 rollout、验证调度。
+
+需要 torch 的部分（模型各层、张量构造、训练前向）目前只做了静态校验
+（语法、导入解析、调用签名与配置字段一致性），相应运行时测试待环境具备后补。
 
 ## 环境
 

@@ -80,6 +80,12 @@ class WebVLNConfig:
     pad_token_id: int = 0
     cls_token_id: int = 101
     sep_token_id: int = 102
+    # 答案序列的起止符。官方 ``pad_answer_tokens`` 借用 BERT 词表里未使用的
+    # ``[unused0]`` / ``[unused1]`` 槽位（id 1 / 2），不复用 [CLS] / [SEP]——
+    # 那两个 token 在指令编码中已有含义，共享会让回答头与语言分支
+    # 争夺同一个嵌入向量。
+    answer_bos_id: int = 1
+    answer_eos_id: int = 2
 
     device: str = "cuda"
     seed: int = 0

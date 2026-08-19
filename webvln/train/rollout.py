@@ -101,6 +101,9 @@ class RolloutRecorder:
     """
 
     def __init__(self, obs: Sequence[Observation]) -> None:
+        # 留住起始观测：答案序列属于 episode 本身，
+        # rollout 结束后的观测反映的是当前页面，不能用来取答案。
+        self.obs: List[Observation] = list(obs)
         self.trajectories: List[List[str]] = [[ob.url_id] for ob in obs]
         self.idxs: List[Any] = [ob.idx for ob in obs]
         self.ended: List[bool] = [False] * len(obs)

@@ -47,7 +47,10 @@
 - [x] 导航环境与 rollout（`train/env.py`、`train/rollout.py`，均不依赖 torch）
       - 教师动作按最短路径重算，偏离 ground-truth 后仍有效
       - 筛选后教师动作重新对齐下标；目标被筛掉时落到 [EOA]
-- [ ] 训练循环（AdamW, lr 1e-5, 200k iters，需 torch）
+- [x] 训练循环（`train/trainer.py`、`train/batching.py`，AdamW / 200k iters）
+      - mix 展开为 sample + teacher 两趟，损失累加后一次反传（官方做法）
+      - 验证调度 140,000 后每 1,000 步，按 Best Score = SR + WUPS0.9 选模型
+      - 张量构造需 torch，仅做静态校验；调度与长度计算已单测
 - [x] 评测指标（SR / OSR / SPL / TL / WUPS）
       - `eval/metrics.py` 式 (5.1.1) SPL、OSR、Best Score = SR + WUPS0.9
       - `eval/wups.py` 词项集合版 + 官方逐字符版（论文数字由后者产出）

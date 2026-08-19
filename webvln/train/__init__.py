@@ -11,6 +11,11 @@ batch 4（官方）/ 8（论文），200,000 迭代，140,000 后每 1,000 步�
 按 Best Score = SR + WUPS0.9 选模型。
 """
 
+from webvln.train.batching import (
+    build_candidate_tensor,
+    candidate_lengths,
+    token_lengths,
+)
 from webvln.train.env import Observation, WebVLNEnv
 from webvln.train.rollout import (
     FEEDBACK_ARGMAX,
@@ -32,6 +37,13 @@ __all__ = [
     "RolloutRecorder",
     "StepDecision",
     "WebVLNEnv",
+    "build_candidate_tensor",
+    "candidate_lengths",
     "resolve_action",
     "teacher_action",
+    "token_lengths",
 ]
+
+# Trainer 需要 torch，故不在包导入时拉起——本机无 torch 时
+# ``from webvln.train import WebVLNEnv`` 仍应可用。
+# 使用方式：``from webvln.train.trainer import Trainer``。
