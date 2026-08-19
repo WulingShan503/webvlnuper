@@ -41,7 +41,9 @@
       - `episode.py` episode 数据结构（可转回官方字典格式）
       - `text.py` 指令 / 答案编码（对齐官方 maxInput 50、答案 40）
       - `dataset.py` 划分加载、`_enc.json` 缓存、批次回绕取样、规模自检
-- [ ] 特征提取（ResNet152）
+- [x] 特征提取（ResNet152）与导航图
+      - `features.py` 三张官方 pkl 的统一查询 + `ResNet152Extractor` 重抽路径
+      - `graph.py` `map.json` / `shortest_paths.json`、教师动作定位、候选规模自检
 - [ ] rollout 采样与训练循环（AdamW, lr 1e-4, 200k iters）
 - [ ] 评测指标（SR / OSR / SPL / TL / WUPS）
 

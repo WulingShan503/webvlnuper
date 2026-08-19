@@ -69,8 +69,10 @@ webvln/
     episode.py             episode 数据结构（导航路径 + QA）
     text.py                指令与答案的 WordPiece 编码
     dataset.py             划分加载与批次取样
+    features.py            3.3  候选三段特征（官方 pkl / ResNet152 重抽）
+    graph.py               导航图、最短路径与教师动作定位
   train/                 训练 / 评测循环
-tests/                   单元测试（143 个）
+tests/                   单元测试（162 个）
 ```
 
 ## 接入基线模型
@@ -138,7 +140,7 @@ pip install pytest pyyaml
 python -m pytest tests
 ```
 
-第四章筛选模块、第三章配置与数据加载共 143 个测试，不依赖 torch 与 API key 即可运行。
+第四章筛选模块、第三章配置与数据加载共 162 个测试，不依赖 torch 与 API key 即可运行。
 第三章其余模块（跨模态层、回答头、损失）需 torch，相应测试待补。
 
 ## 环境

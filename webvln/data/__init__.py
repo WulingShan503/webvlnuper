@@ -18,6 +18,13 @@ from webvln.data.dataset import (
     split_path,
 )
 from webvln.data.episode import Episode, infer_website_id
+from webvln.data.features import (
+    DEFAULT_FEATURE_SIZE,
+    PAPER_CONCAT_DIM,
+    FeatureStore,
+    ResNet152Extractor,
+)
+from webvln.data.graph import NavigationGraph
 from webvln.data.text import (
     ANSWER_BOS_TOKEN,
     ANSWER_EOS_TOKEN,
@@ -35,9 +42,14 @@ from webvln.data.text import (
 __all__ = [
     "ANSWER_BOS_TOKEN",
     "ANSWER_EOS_TOKEN",
+    "DEFAULT_FEATURE_SIZE",
     "DEFAULT_MAX_ANSWER_LEN",
     "DEFAULT_MAX_INSTR_LEN",
     "Episode",
+    "FeatureStore",
+    "NavigationGraph",
+    "PAPER_CONCAT_DIM",
+    "ResNet152Extractor",
     "SPLIT_SIZES",
     "WebVLNDataset",
     "attention_mask_from_length",
