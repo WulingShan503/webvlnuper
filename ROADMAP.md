@@ -56,7 +56,13 @@
       - `eval/wups.py` 词项集合版 + 官方逐字符版（论文数字由后者产出）
 
 ## 阶段 4：实验复现
-- [ ] 5.2 基线复现实验
-- [ ] 5.3 Top-k 消融
-- [ ] 5.4 CR / RR 分析
-- [ ] 5.5 两阶段有效性验证
+
+> 实验由用户自行运行（需 torch 与 API key）。代码负责配置装配、
+> 结果汇总与与论文数字的自动比对；论文数字集中在 `experiments/reference.py`。
+
+- [x] 论文数字与内部不一致的记录（`reference.py`，含 5 处 KNOWN_INCONSISTENCIES）
+- [x] 5.2 基线复现（`baseline_config`，关闭筛选）
+- [x] 5.3 Top-k 消融（`screening_config_for_k`，k ∈ {3,5,8}）
+- [x] 5.4 CR / RR 分析（`rule_filter_only_config` + `screening_summary_row`）
+- [x] 5.5 两阶段有效性验证（`single_stage_config` 对照）
+- [x] 实验驱动脚本（`runner.py`，`python -m webvln.experiments.runner`）

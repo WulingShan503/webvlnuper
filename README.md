@@ -79,7 +79,11 @@ webvln/
     rollout.py             动作解析、停止判定与轨迹记录
     batching.py            观测 → 张量（3n+1 与 n+1 两套长度）
     trainer.py             3.9  优化循环、验证调度与模型选择
-tests/                   单元测试（226 个）
+  experiments/           第五章：实验复现
+    reference.py           论文报告的数字与内部不一致的记录
+    ablation.py            各实验的配置装配与结果比对
+    runner.py              实验驱动脚本
+tests/                   单元测试（252 个）
 ```
 
 ## 接入基线模型
@@ -182,8 +186,9 @@ pip install pytest pyyaml
 python -m pytest tests
 ```
 
-共 226 个测试，不依赖 torch、nltk 与 API key 即可运行：第四章筛选模块、
-第三章配置与数据加载、第五章评测指标、导航环境与 rollout、验证调度。
+共 252 个测试，不依赖 torch、nltk 与 API key 即可运行：第四章筛选模块、
+第三章配置与数据加载、第五章评测指标、导航环境与 rollout、验证调度、
+实验配置装配与论文数字的内部一致性。
 
 需要 torch 的部分（模型各层、张量构造、训练前向）目前只做了静态校验
 （语法、导入解析、调用签名与配置字段一致性），相应运行时测试待环境具备后补。
@@ -196,6 +201,43 @@ pip install -r requirements.txt
 ```
 
 论文实验环境：Ubuntu 20.04 LTS，Python 3.8，PyTorch 1.13，NVIDIA RTX 3090 (24GB)。
+
+## 复现第五章实验
+
+```bash
+# 5.3 节 Top-k 消融：基线 + k ∈ {3, 5, 8}
+python -m webvln.experiments.runner --data-dir Data --exp ablation --out results.json
+
+# 5.5 节两阶段有效性：单阶段（45 个候选直接给 LLM）vs 两阶段
+python -m webvln.experiments.runner --data-dir Data --exp two_stage
+```
+
+`--exp` 取 `baseline` / `ablation` / `two_stage` / `stage_one`，分别对应
+论文 5.2 / 5.3 / 5.5 / 5.4 节。`--load` 给出已有权重时跳过训练直接评测，
+消融可共用同一份权重。输出是 Markdown 表格：导航指标、筛选指标，
+以及与论文数字的逐项差异（默认容差 0.5 个百分点）。
+
+论文报告的数字集中在 `webvln/experiments/reference.py`，供自动比对。
+
+### 论文内部数字不一致
+
+核对表格与正文时发现几处数字互不吻合。代码**以表格为准**（表格是结果的
+正式呈现），并把差异记在 `reference.py:KNOWN_INCONSISTENCIES`，
+以免读者以为实现有误：
+
+| 项 | 表格 | 正文 |
+| --- | --- | --- |
+| k=5 Val SR | 表 5.2：39.12 | 5.3 节：39.67（与表 5.4 数字相同，疑为误引） |
+| k=5 Test SR | 表 5.2：35.03 | 5.3 节：35.12，另一处 35.24 |
+| k=3 / k=8 Val SR | 表 5.2：38.90 / 38.67 | 5.3 节：38.92 / 39.12 |
+| Top-5 RR | 表 5.3：93.5 | 5.4 节第 2 点：88.9，第 3 点：89.3 |
+| Top-3 / Top-8 RR | 表 5.3：88.2 / 96.8 | 5.4 节第 3 点：76.5 / 94.1 |
+
+平均候选数的 12.4（表 5.3）与 45（4.1 / 5.4 节正文）不是矛盾而是口径不同：
+45 为全量候选的平均，12.4 是表 5.3 那 500 步样本上经阶段一之后的平均。
+表 5.3 的三个 CR 可验证这一点 —— `1 - 8/12.4 = 35.5%`、`1 - 5/12.4 = 59.7%`、
+`1 - 3/12.4 = 75.8%`，与表中数字完全吻合，说明 CR 是相对 12.4 计算的。
+这条算术关系已写成测试固定下来。
 
 ## 与官方实现的差异
 
@@ -223,4 +265,6 @@ WUPS 还有一处需要注意。官方 `calculate_wups(gt, pred, thresh)` 内部
 
 ## 状态
 
-代码库正在按论文章节逐步搭建，当前进度见 [ROADMAP.md](ROADMAP.md)。
+第三章（基线复现）、第四章（候选筛选）、第五章（评测与实验编排）的代码
+均已就位，进度见 [ROADMAP.md](ROADMAP.md)。实验由作者在具备 GPU 与
+API key 的环境中运行，本仓库不含权重与数据。
