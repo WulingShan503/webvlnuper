@@ -59,7 +59,10 @@ class WebVLNConfig:
     # 官方 run/train.bash 用 1e-5；论文 3.9 / 5.1 节写 1e-4。
     learning_rate: float = 1e-5
     weight_decay: float = 1e-2
-    max_grad_norm: float = 1.0
+    # 官方 ``agent.py`` 两处均为 ``clip_grad_norm(..., 40.)``；
+    # 论文 5.1 节按常规写法记 1.0。40 几乎不触发裁剪，
+    # 改成 1.0 会显著改变训练动态，故仍以官方为准。
+    max_grad_norm: float = 40.0
     batch_size: int = 4  # 官方 4；论文写 8
     max_iters: int = 200_000
     # 论文 3.9 节：140,000 迭代后每 1,000 步验证一次

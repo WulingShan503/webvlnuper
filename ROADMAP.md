@@ -44,7 +44,10 @@
 - [x] 特征提取（ResNet152）与导航图
       - `features.py` 三张官方 pkl 的统一查询 + `ResNet152Extractor` 重抽路径
       - `graph.py` `map.json` / `shortest_paths.json`、教师动作定位、候选规模自检
-- [ ] rollout 采样与训练循环（AdamW, lr 1e-4, 200k iters）
+- [x] 导航环境与 rollout（`train/env.py`、`train/rollout.py`，均不依赖 torch）
+      - 教师动作按最短路径重算，偏离 ground-truth 后仍有效
+      - 筛选后教师动作重新对齐下标；目标被筛掉时落到 [EOA]
+- [ ] 训练循环（AdamW, lr 1e-5, 200k iters，需 torch）
 - [x] 评测指标（SR / OSR / SPL / TL / WUPS）
       - `eval/metrics.py` 式 (5.1.1) SPL、OSR、Best Score = SR + WUPS0.9
       - `eval/wups.py` 词项集合版 + 官方逐字符版（论文数字由后者产出）

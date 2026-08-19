@@ -75,7 +75,9 @@ webvln/
     metrics.py             5.1  SR / OSR / SPL / TL 与 Best Score
     wups.py                5.1  WUPS（含官方逐字符行为的复刻）
   train/                 训练 / 评测循环
-tests/                   单元测试（190 个）
+    env.py                 导航环境与观测（筛选插在特征查表之前）
+    rollout.py             动作解析、停止判定与轨迹记录
+tests/                   单元测试（215 个）
 ```
 
 ## 接入基线模型
@@ -143,8 +145,8 @@ pip install pytest pyyaml
 python -m pytest tests
 ```
 
-第四章筛选模块、第三章配置与数据加载、第五章评测指标共 190 个测试，
-不依赖 torch、nltk 与 API key 即可运行。
+第四章筛选模块、第三章配置与数据加载、第五章评测指标、导航环境与 rollout
+共 215 个测试，不依赖 torch、nltk 与 API key 即可运行。
 第三章其余模块（跨模态层、回答头、损失）需 torch，相应测试待补。
 
 ## 环境

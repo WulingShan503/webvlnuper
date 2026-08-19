@@ -40,6 +40,11 @@ def test_eval_schedule_follows_paper():
     assert cfg.eval_interval == 1_000
 
 
+def test_official_grad_clipping():
+    # 官方 agent.py 两处均为 clip_grad_norm(..., 40.)，不是论文写的 1.0。
+    assert WebVLNConfig().max_grad_norm == 40.0
+
+
 def test_sequence_lengths_match_official_args():
     # 指令 50 来自 --maxInput 50；答案 40 来自 prepare_dataset 的调用。
     # 两者须与 webvln/data/text.py 的默认值一致，否则数据与模型对不上。
