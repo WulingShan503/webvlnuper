@@ -1,0 +1,39 @@
+name: tests
+
+# 单元测试不依赖 torch / nltk 语料 / API key，因此 CI 只装 pytest 与 PyYAML，
+# 几十秒即可跑完，无需 GPU。需 torch 的模块目前只做静态校验（见 README）。
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main]
+  # 允许在 Actions 页面手动触发，便于改完配置立刻验证。
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.8 是论文实验环境的版本，须保证代码在其上可用；
+        # 3.11 用于暴露新版本才会报的弃用问题。
+        python-version: ["3.8", "3.11"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Run tests
+        run: python -m pytest tests -q

@@ -1,5 +1,9 @@
 # webvlnuper
 
+[![tests](https://github.com/WulingShan503/webvlnuper/actions/workflows/tests.yml/badge.svg)](https://github.com/WulingShan503/webvlnuper/actions/workflows/tests.yml)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](pyproject.toml)
+
 本项目针对多模态AI智能体在复杂网页环境中的决策效率问题，通过复现并改进WebVLN （视觉语言导航）基线模型，设计了一种基于大语言模型的两阶段候选动作筛选机制，有效压缩了高噪声的候选决策空间，提升了模型在复杂UI环境中的导航准确率与路径效率。
 
 > 论文：《基于视觉感知的网页自动导航模型优化》（对外经济贸易大学，2026-3）
@@ -182,7 +186,7 @@ trainer.fit(splits["train"], {"val": splits["val"], "test": splits["test"]},
 ## 测试
 
 ```bash
-pip install pytest pyyaml
+pip install -r requirements-dev.txt
 python -m pytest tests
 ```
 
@@ -197,10 +201,12 @@ python -m pytest tests
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements.txt        # 运行时（含 torch）
+pip install -r requirements-dev.txt    # 仅测试，几秒装完
 ```
 
 论文实验环境：Ubuntu 20.04 LTS，Python 3.8，PyTorch 1.13，NVIDIA RTX 3090 (24GB)。
+CI 在 Python 3.8 与 3.11 上跑测试，只装 `requirements-dev.txt`，不需要 GPU。
 
 ## 复现第五章实验
 
@@ -268,3 +274,31 @@ WUPS 还有一处需要注意。官方 `calculate_wups(gt, pred, thresh)` 内部
 第三章（基线复现）、第四章（候选筛选）、第五章（评测与实验编排）的代码
 均已就位，进度见 [ROADMAP.md](ROADMAP.md)。实验由作者在具备 GPU 与
 API key 的环境中运行，本仓库不含权重与数据。
+
+## 论文全文
+
+`毕业论文.pdf` 为学位论文全文（非密级，著作权归作者所有），随仓库一并提供，
+便于对照代码与论文的章节编号 —— 各模块的 docstring 均标注了对应小节号
+（如 `4.4 节`、`式 (4.5.1)`）。
+
+基线论文 `00105-AAAI24.ChenQ.pdf` 版权属 AAAI，**不纳入版本控制**，
+需自行从 AAAI 官网获取。`.gitignore` 中 `*.pdf` 默认忽略、仅显式放行本文论文，
+以免误提交打印稿与中间版本。
+
+## 引用
+
+```bibtex
+@software{shan2026webvlnuper,
+  author = {Shan, Wuling},
+  title  = {WebvlnUper: 基于视觉感知的网页自动导航模型优化},
+  year   = {2026},
+  url    = {https://github.com/WulingShan503/webvlnuper}
+}
+```
+
+仓库另附 [CITATION.cff](CITATION.cff)，GitHub 会据此在侧栏生成引用信息。
+
+## 许可
+
+代码以 [MIT](LICENSE) 许可发布。论文全文与基线论文不在此许可范围内：
+前者著作权归作者，后者归 AAAI。

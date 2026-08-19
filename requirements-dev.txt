@@ -1,0 +1,9 @@
+# 测试依赖。全部单元测试只需这两个包——
+# 模型层用轻量替身、WUPS 的相似度函数可注入、LLM 后端有 ScriptedBackend，
+# 因此不必装 torch（数百 MB）与 nltk 语料即可跑完 252 个测试。
+#
+#   pip install -r requirements-dev.txt
+#   python -m pytest tests
+
+pytest==7.2.2
+PyYAML==6.0

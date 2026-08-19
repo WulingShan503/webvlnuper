@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+title: "WebvlnUper：基于视觉感知的网页自动导航模型优化"
+message: 若本仓库对你的研究有帮助，请按下列信息引用。
+type: software
+authors:
+  - family-names: Shan
+    given-names: Wuling
+    affiliation: 对外经济贸易大学 (University of International Business and Economics)
+repository-code: "https://github.com/WulingShan503/webvlnuper"
+abstract: >-
+  复现 WebVLN-Net 基线（Chen et al., AAAI 2024），并在其之上实现基于
+  大语言模型的两阶段候选动作筛选机制：阶段一规则过滤，阶段二 LLM 语义
+  排序取 Top-k，用以压缩网页导航中高噪声的候选决策空间。
+keywords:
+  - vision-and-language navigation
+  - web navigation
+  - large language models
+  - candidate action pruning
+license: MIT
+date-released: "2026-03-01"
+
+references:
+  - type: conference-paper
+    title: "WebVLN: Vision-and-Language Navigation on Websites"
+    authors:
+      - family-names: Chen
+        given-names: Qi
+      - name: et al.
+    collection-title: >-
+      Proceedings of the AAAI Conference on Artificial Intelligence
+    volume: 38
+    issue: 2
+    start: 1165
+    end: 1173
+    year: 2024

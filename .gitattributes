@@ -1,0 +1,17 @@
+# 统一换行符：仓库内一律存 LF，签出时由 Git 按平台转换。
+# 不设这一条时，Windows 上每次提交都会刷 "LF will be replaced by CRLF" 警告。
+* text=auto eol=lf
+
+# 明确标为二进制，避免 Git 尝试做换行符转换或行级 diff。
+*.pdf   binary
+*.pkl   binary
+*.pt    binary
+*.pth   binary
+*.png   binary
+*.jpg   binary
+
+# 论文与基线 PDF 不参与 diff 统计，也不计入 GitHub 的语言比例。
+*.pdf   -diff linguist-documentation
+
+# 测试代码不计入语言统计，让 GitHub 显示的语言比例反映实现代码。
+tests/** linguist-test

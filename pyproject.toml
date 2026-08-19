@@ -6,7 +6,16 @@ build-backend = "setuptools.build_meta"
 name = "webvlnuper"
 version = "0.1.0"
 description = "基于视觉感知的网页自动导航模型优化：WebVLN 复现与 LLM 两阶段候选筛选"
+readme = "README.md"
 requires-python = ">=3.8"
+license = { file = "LICENSE" }
+authors = [{ name = "Wuling Shan" }]
+keywords = ["vision-and-language-navigation", "web-navigation", "llm"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.8",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 
 [tool.setuptools.packages.find]
 include = ["webvln*"]
