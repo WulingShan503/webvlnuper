@@ -49,8 +49,10 @@ class WebVLNConfig:
     # --- 文本 ---
     vocab_size: int = 30522  # bert-base-uncased
     max_position_embeddings: int = 512
-    max_instr_len: int = 80
-    max_answer_len: int = 30
+    # 官方 ``--maxInput 50``（param.py）；prepare_dataset 用 40 编码答案。
+    # 论文 3.2 / 3.7 节未给具体截断长度，故以官方为准。
+    max_instr_len: int = 50
+    max_answer_len: int = 40
     bert_model_name: str = "bert-base-uncased"
 
     # --- 训练 ---

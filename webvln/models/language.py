@@ -24,7 +24,7 @@ def build_instruction_tokens(
     question: str,
     description: str = "",
     tokenizer=None,
-    max_len: int = 80,
+    max_len: int = 50,
 ) -> Tuple[List[int], List[int]]:
     """把 Q 与 D 编码为 ``[CLS] Q [SEP] D [SEP]`` 的 token id 序列。
 

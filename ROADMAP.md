@@ -37,7 +37,10 @@
 - [ ] 补齐依赖 torch 的单元测试（本机无 torch，待环境具备）
 
 ## 阶段 3：数据与训练
-- [ ] WebVLN-v1 数据集加载（8,960 / 1,262 / 4,603）
+- [x] WebVLN-v1 数据集加载（8,960 / 1,262 / 4,603）
+      - `episode.py` episode 数据结构（可转回官方字典格式）
+      - `text.py` 指令 / 答案编码（对齐官方 maxInput 50、答案 40）
+      - `dataset.py` 划分加载、`_enc.json` 缓存、批次回绕取样、规模自检
 - [ ] 特征提取（ResNet152）
 - [ ] rollout 采样与训练循环（AdamW, lr 1e-4, 200k iters）
 - [ ] 评测指标（SR / OSR / SPL / TL / WUPS）

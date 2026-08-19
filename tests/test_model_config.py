@@ -40,6 +40,16 @@ def test_eval_schedule_follows_paper():
     assert cfg.eval_interval == 1_000
 
 
+def test_sequence_lengths_match_official_args():
+    # 指令 50 来自 --maxInput 50；答案 40 来自 prepare_dataset 的调用。
+    # 两者须与 webvln/data/text.py 的默认值一致，否则数据与模型对不上。
+    from webvln.data.text import DEFAULT_MAX_ANSWER_LEN, DEFAULT_MAX_INSTR_LEN
+
+    cfg = WebVLNConfig()
+    assert cfg.max_instr_len == DEFAULT_MAX_INSTR_LEN == 50
+    assert cfg.max_answer_len == DEFAULT_MAX_ANSWER_LEN == 40
+
+
 def test_attention_head_size_divides_evenly():
     cfg = WebVLNConfig(hidden_size=768, num_attention_heads=8)
     assert cfg.attention_head_size == 96

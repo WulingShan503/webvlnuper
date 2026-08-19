@@ -65,9 +65,12 @@ webvln/
     answering.py           3.7  回答头
     losses.py              3.8  损失函数
     webvln_net.py          主模型串联
-  data/                  WebVLN-v1 数据集加载与特征
+  data/                  第三 / 五章：WebVLN-v1 数据集加载
+    episode.py             episode 数据结构（导航路径 + QA）
+    text.py                指令与答案的 WordPiece 编码
+    dataset.py             划分加载与批次取样
   train/                 训练 / 评测循环
-tests/                   单元测试（101 个）
+tests/                   单元测试（143 个）
 ```
 
 ## 接入基线模型
@@ -101,6 +104,33 @@ print(out.kept_indices)          # 保留候选的原始下标
 print(screener.stats())          # CR / RR / API 调用与缓存命中
 ```
 
+## 数据准备
+
+WebVLN-v1 从官方仓库的 Google Drive 链接下载，按官方目录组织：
+
+```
+Data/
+  shortest_paths.json          最短路径表（教师动作与 SPL 的依据）
+  map.json                     各页面的候选元素
+  img_feats.pkl                按钮图特征
+  text_feats.pkl               候选文本特征
+  screenshot_crop_feats.pkl    截图裁剪特征
+  seen/
+    train.json  val.json  test.json      8,960 / 1,262 / 4,603
+```
+
+```python
+from webvln.data import WebVLNDataset, load_bert_tokenizer
+
+ds = WebVLNDataset.from_dir("Data", setting="seen", split="train",
+                            tokenizer=load_bert_tokenizer(), batch_size=4)
+print(ds.check_size())        # None 表示与论文 2.3 节的划分规模一致
+batch = ds.next_minibatch()   # 末尾不足时回绕补满，训练按迭代数计数
+```
+
+首次加载会现场做 WordPiece 编码；用 `save_encoded` 写出 `{split}_enc.json`
+后，后续运行直接复用缓存（与官方 `prepare_dataset` 的行为一致）。
+
 ## 测试
 
 ```bash
@@ -108,7 +138,7 @@ pip install pytest pyyaml
 python -m pytest tests
 ```
 
-第四章筛选模块与第三章配置共 110 个测试，不依赖 torch 与 API key 即可运行。
+第四章筛选模块、第三章配置与数据加载共 143 个测试，不依赖 torch 与 API key 即可运行。
 第三章其余模块（跨模态层、回答头、损失）需 torch，相应测试待补。
 
 ## 环境
