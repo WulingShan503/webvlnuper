@@ -71,8 +71,11 @@ webvln/
     dataset.py             划分加载与批次取样
     features.py            3.3  候选三段特征（官方 pkl / ResNet152 重抽）
     graph.py               导航图、最短路径与教师动作定位
+  eval/                  第五章：评测指标
+    metrics.py             5.1  SR / OSR / SPL / TL 与 Best Score
+    wups.py                5.1  WUPS（含官方逐字符行为的复刻）
   train/                 训练 / 评测循环
-tests/                   单元测试（162 个）
+tests/                   单元测试（190 个）
 ```
 
 ## 接入基线模型
@@ -140,7 +143,8 @@ pip install pytest pyyaml
 python -m pytest tests
 ```
 
-第四章筛选模块、第三章配置与数据加载共 162 个测试，不依赖 torch 与 API key 即可运行。
+第四章筛选模块、第三章配置与数据加载、第五章评测指标共 190 个测试，
+不依赖 torch、nltk 与 API key 即可运行。
 第三章其余模块（跨模态层、回答头、损失）需 torch，相应测试待补。
 
 ## 环境
@@ -155,7 +159,7 @@ pip install -r requirements.txt
 ## 与官方实现的差异
 
 复现第三章时核对了官方 [WebVLN](https://github.com/WebVLN/WebVLN) 的 `r2r_src/`，
-发现四处与论文正文描述不一致。代码**以官方实现为准**（论文报告的 SR / SPL 由该代码产出），
+发现以下与论文正文描述不一致之处。代码**以官方实现为准**（论文报告的 SR / SPL 由该代码产出），
 论文写法保留在注释与 `PAPER_CONFIG` 中：
 
 | 项 | 论文 | 官方实现 |
@@ -164,9 +168,17 @@ pip install -r requirements.txt
 | 动作 logits | softmax over M 候选 | 跨模态注意力分数对头取平均 |
 | 层数 | 跨模态 4 层 / 回答头 4 层 | `vl_layers=2` / `qa_layers=2` |
 | 学习率 | 1e-4 | 1e-5（`run/train.bash`） |
+| 指令 / 答案截断 | 未说明 | 50 / 40（`--maxInput 50`） |
 
 候选特征的组织方式带来一处实现细节：注意力分数长度为 `3n+1`，
 而动作空间为 `n+1`，两者需按步长 3 归约（见 `action.py:pool_token_logits`）。
+
+WUPS 还有一处需要注意。官方 `calculate_wups(gt, pred, thresh)` 内部按
+`zip(input_gt, input_pred)` 配对，而 `eval.py` 传进去的是两个**字符串**，
+于是实际逐**字符**计算 WUPS，且分数按较短那个字符串截断——预测是真值前缀时
+会拿到满分。论文表 5.1 的 WUPS0.9 / WUPS0.0 数字由此产生。
+`webvln/eval/wups.py` 因此提供两个函数：`wups_official` 复刻该行为
+（复现已发表数字用它），`wups` 按词项集合实现指标的本来定义。
 
 ## 状态
 

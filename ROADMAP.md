@@ -45,7 +45,9 @@
       - `features.py` 三张官方 pkl 的统一查询 + `ResNet152Extractor` 重抽路径
       - `graph.py` `map.json` / `shortest_paths.json`、教师动作定位、候选规模自检
 - [ ] rollout 采样与训练循环（AdamW, lr 1e-4, 200k iters）
-- [ ] 评测指标（SR / OSR / SPL / TL / WUPS）
+- [x] 评测指标（SR / OSR / SPL / TL / WUPS）
+      - `eval/metrics.py` 式 (5.1.1) SPL、OSR、Best Score = SR + WUPS0.9
+      - `eval/wups.py` 词项集合版 + 官方逐字符版（论文数字由后者产出）
 
 ## 阶段 4：实验复现
 - [ ] 5.2 基线复现实验
