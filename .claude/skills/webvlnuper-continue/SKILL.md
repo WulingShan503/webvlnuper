@@ -50,7 +50,7 @@ cd "D:/WebvlnUper" && .tools/py/python.exe -m pytest tests
 
 ## 已完成（第四章，核心贡献）
 
-`webvln/screening/` 共 12 个模块，101 个测试全部通过：
+`webvln/screening/` 共 12 个模块：
 
 | 模块 | 论文 | 要点 |
 |---|---|---|
@@ -88,21 +88,44 @@ cd "D:/WebvlnUper" && .tools/py/python.exe -m pytest tests
 **与论文的四处差异**已记在 `[[webvln-official-model-vs-thesis]]` 与 README 的
 "与官方实现的差异"表格里，实现以官方为准。
 
-## 下一步：阶段 3 数据与训练
+## 已完成（阶段 3 数据与训练、阶段 5 实验编排）
 
-按 `ROADMAP.md`：数据集加载（8,960 / 1,262 / 4,603）→ ResNet152 特征提取
-→ rollout 与训练循环 → 评测指标（SR / OSR / SPL / TL / WUPS）。
+`webvln/data/`：`episode.py`（可转回官方字典）、`text.py`（指令 50 / 答案 40，
+BOS/EOS 用 `[unused0]`/`[unused1]`）、`dataset.py`（`_enc.json` 优先、
+批次回绕、规模自检 8960/1262/4603）、`features.py`（三张 pkl 统一查询，
+缺失即零向量并计数 + `ResNet152Extractor`）、`graph.py`（教师动作返回
+稳定的 clickable_id，不可达与叶子页不抛错）。
+
+`webvln/eval/`：`metrics.py`（式 5.1.1、OSR、失败样本 SPL/WUPS 记 0、
+按 idx 去重、Best Score）、`wups.py`（`wups_official` 复刻官方逐字符行为
+＋ `wups` 词项集合版；相似度函数可注入，故无 nltk 也能测）。
+
+`webvln/train/`：`env.py`（筛选插在特征查表前；教师动作按**最短路径**重算，
+偏离 gt_path 后仍有效）、`rollout.py`（[EOA]/ignoreid/已结束/越界均置 -1）、
+`batching.py`（`j*3+k` 铺排；3n+1 与 n+1 两套长度）、`trainer.py`
+（mix 展开两趟后一次反传、140k 后每 1k 步验证、只用验证集选模型）。
+
+`webvln/experiments/`：`reference.py`（论文数字 + 5 处内部不一致）、
+`ablation.py`（派生配置不改基准）、`runner.py`
+（`python -m webvln.experiments.runner --data-dir Data --exp ablation`）。
+
+**ROADMAP 阶段 0-4 已全部打勾，252 个测试通过。**
+
+## 剩下的唯一一项
+
+补齐需 torch 的运行时测试：`models/` 各层、`train/batching.py` 的张量构造、
+`trainer.py` 的前向。目前只做了静态校验（ast 核对调用签名与配置字段）。
+装 torch 后可先跑一个 2 样本、3 候选的极小前向，验证
+`3n+1 → n+1` 的归约与 [EOA] 全零特征的行为。
 
 关键数字：AdamW lr 1e-5（官方）/ 1e-4（论文），weight decay 1e-2，
-梯度裁剪 1.0，batch 4（官方）/ 8（论文），200,000 迭代，
-140,000 后每 1,000 步验证；Best Score = SR + WUPS0.9；maxAction 10；
-featdropout / dropout 均 0.4；feedback 用 `mix`（teacher 与 argmax 混合）。
+**梯度裁剪 40**（官方，论文写 1.0），batch 4（官方）/ 8（论文），
+200,000 迭代，140,000 后每 1,000 步验证；Best Score = SR + WUPS0.9；
+maxAction 10；featdropout / dropout 均 0.4；feedback `mix`。
 
 数据路径：`shortest_paths.json`、`map.json`、`text_feats.pkl`、
-`img_feats.pkl`、`screenshot_crop_feats.pkl`（官方 Google Drive 下载）。
-
-rollout 关键逻辑在官方 `agent.py:253` 起，教师动作在 `_teacher_action`，
-候选特征铺排在 `_candidate_variable`。
+`img_feats.pkl`、`screenshot_crop_feats.pkl`（官方 Google Drive 下载），
+划分在 `{data_dir}/seen/{split}.json`。
 
 ## 易错点
 
@@ -112,6 +135,12 @@ rollout 关键逻辑在官方 `agent.py:253` 起，教师动作在 `_teacher_act
 - 跳过 `[EOA]` 时不能让后续候选下标前移，否则与 `make_candidate` 行号错位。
 - 解析失败的 LLM 结果**不入缓存**，否则该页面永久退化为不筛选。
 - 不要就地修改模拟器的 `state['candidate']`，模拟器内部持有同一对象。
+
+第五章（实验数字）：
+- 表 5.3 的 CR 基数是 **12.4** 不是 45（`1-5/12.4=59.7` 与表吻合）。
+- 论文表格与正文有 5 处数字不一致，**以表格为准**，见
+  `experiments/reference.py:KNOWN_INCONSISTENCIES` 与 README 对照表。
+- 复现 WUPS 必须用 `wups_official`（逐字符），否则得不到论文的 24.26 / 31.87。
 
 第三章（模型）：
 - 注意力分数长度是 `3n+1`（每候选 3 个 token），动作空间是 `n+1`，
